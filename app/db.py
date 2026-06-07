@@ -1,0 +1,127 @@
+import os 
+import psycopg2
+from flask import current_app
+import bleach
+from hashids import Hashids
+from app import utils
+ 
+
+Database_url = os.getenv("DATABASE_URL")
+
+hashids = Hashids(
+    salt=os.getenv("HashID_SALT"), 
+    min_length=6
+)
+
+def db_connect():
+    return psycopg2.connect(Database_url)
+
+def store_info(username, email, p_hash):
+    try:
+        with db_connect() as conn:
+            with conn.cursor() as c:
+                c.execute("INSERT INTO users(username, email, password_hash) VALUES (%s, %s, %s)", 
+                          (bleach.clean(username), bleach.clean(email), p_hash))
+    except psycopg2.Error:
+        current_app.logger.exception("Failed to load user's info")
+        raise
+
+def check_existing_users(email):
+    try:
+        with db_connect() as conn:
+            with conn.cursor() as c:
+                c.execute("SELECT email FROM  users WHERE email = %s", (email))
+                existing_user = c.fetchone()
+                if existing_user:
+                    return True
+                return None
+    except psycopg2.Error:
+        current_app.logger.exception("Failed to check existing email")
+        raise
+
+
+def valid_p(email):
+    try:
+        with db_connect() as conn:
+            with conn.cursor() as c:
+                c.execute("SELECT id, password_hash FROM users WHERE email = %s", (email))
+                proof = c.fetchone() 
+                return proof
+    except psycopg2.Error:
+        current_app.logger.exception("Failed to fetch data")
+        raise
+
+def gen_shortc(user_id, encrypted_url, url_hash):
+    try:
+        new_short_url = None
+        with db_connect() as conn:
+            with conn.cursor() as c:
+                c.execute("""INSERT INTO links(
+                          user_id,
+                          encrypted_url,
+                          url_hash) 
+                          VALUES(%s, %s, %s), RETURNING id 
+                          """,(user_id, encrypted_url, url_hash)
+                          )
+                link_id = c.fetchone()[0]
+                short_code = hashids.encode(link_id)
+
+                c.execute("""UPDATE links 
+                          SET short_code = %s
+                          WHERE id = %s""", (short_code, link_id) 
+                          )
+                new_short_url = f"http://localhost:5000/{short_code}"
+                return new_short_url
+    except psycopg2.Error:
+        current_app.logger.exception("Failed to form short_code")
+        raise 
+
+
+def check_existing(user_id, url_hash):
+    try:
+        with db_connect() as conn:
+            with conn.cursor() as c:
+                c.execute("""SELECT short_code FROM links
+                WHERE user_id = %s AND url_hash = %s""", (user_id, url_hash))
+                short_code=c.fetchone()[0]
+                if short_code:
+                    new_short_url = f"http://localhost:5000/{short_code}"
+                    return new_short_url 
+                return None
+    except psycopg2.Error:
+        current_app.logger.exception("Failed to search url_hash")
+        raise
+    
+
+def get_links(user_id):
+    try:
+        with db_connect() as conn:
+            with conn.cursor() as c:
+                c.execute("""SELECT 
+                          short_code,
+                          title,
+                          clicks
+                          FROM links 
+                          WHERE user_id = %s
+                          ORDER BY created_at DESC """, (user_id))
+                return c.fetchall()
+    except psycopg2.Error:
+        current_app.logger.exception("Failed to fetch links")
+        raise
+
+def get_redirect_url(short_code):
+    try: 
+        with db_connect() as conn:
+            with conn.cursor() as c:
+                c.execute("SELECT encrypted_url FROM links WHERE short_code = %s", (short_code))
+                result = c.fetchone()
+                if not result:
+                    return Exception("Couldn't find encryption")
+                url = utils.decrypt_url(result[0])
+                if not url:
+                    return Exception("Failed decryption")
+                c.execute("UPDATE links SET clicks = clicks + 1 WHERE short_code = %s", (short_code))
+                return url
+    except psycopg2.Error:
+        current_app.logger.exception("Failed to get url")
+        raise
