@@ -30,7 +30,7 @@ def check_existing_users(email):
     try:
         with db_connect() as conn:
             with conn.cursor() as c:
-                c.execute("SELECT email FROM  users WHERE email = %s", (email))
+                c.execute("SELECT email FROM  users WHERE email = %s", (email,))
                 existing_user = c.fetchone()
                 if existing_user:
                     return True
@@ -44,7 +44,7 @@ def valid_p(email):
     try:
         with db_connect() as conn:
             with conn.cursor() as c:
-                c.execute("SELECT id, password_hash FROM users WHERE email = %s", (email))
+                c.execute("SELECT id, password_hash FROM users WHERE email = %s", (email,))
                 proof = c.fetchone() 
                 return proof
     except psycopg2.Error:
@@ -60,7 +60,7 @@ def gen_shortc(user_id, encrypted_url, url_hash):
                           user_id,
                           encrypted_url,
                           url_hash) 
-                          VALUES(%s, %s, %s), RETURNING id 
+                          VALUES(%s, %s, %s) RETURNING id 
                           """,(user_id, encrypted_url, url_hash)
                           )
                 link_id = c.fetchone()[0]
@@ -83,8 +83,9 @@ def check_existing(user_id, url_hash):
             with conn.cursor() as c:
                 c.execute("""SELECT short_code FROM links
                 WHERE user_id = %s AND url_hash = %s""", (user_id, url_hash))
-                short_code=c.fetchone()[0]
-                if short_code:
+                result=c.fetchone()
+                if result:
+                    short_code= result[0]
                     new_short_url = f"http://localhost:5000/{short_code}"
                     return new_short_url 
                 return None
@@ -103,7 +104,7 @@ def get_links(user_id):
                           clicks
                           FROM links 
                           WHERE user_id = %s
-                          ORDER BY created_at DESC """, (user_id))
+                          ORDER BY created_at DESC """, (user_id,))
                 return c.fetchall()
     except psycopg2.Error:
         current_app.logger.exception("Failed to fetch links")
@@ -113,10 +114,10 @@ def get_redirect_url(short_code):
     try: 
         with db_connect() as conn:
             with conn.cursor() as c:
-                c.execute("SELECT encrypted_url FROM links WHERE short_code = %s", (short_code))
+                c.execute("SELECT encrypted_url FROM links WHERE short_code = %s", (short_code,))
                 result = c.fetchone()
                 if not result:
-                    return Exception("Couldn't find encryption")
+                    return None
                 url = utils.decrypt_url(result[0])
                 if not url:
                     return Exception("Failed decryption")

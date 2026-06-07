@@ -9,10 +9,11 @@ links_bp = Blueprint("links", __name__)
 def home():
     try:
         user_id = session.get("user_id")
-        links = db.get_links(user_id)
-
+        
         if not user_id:
             return redirect(url_for("auth.login"))
+        
+        links = db.get_links(user_id)
         
         short_url = None
         

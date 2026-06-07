@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-container">
+
+    <div class="hero-section">
+
+        <h1>URL Shortener Dashboard</h1>
+
+        <p>
+            Create, manage and share shortened links.
+        </p>
+
+    </div>
+
+    <div class="create-card">
+
+        <h2>Create New Link</h2>
+
+        <form method="POST">
+
+            <div class="url-input-group">
+
+                <input
+                    type="url"
+                    name="original_url"
+                    placeholder="https://example.com"
+                    required
+                >
+
+                <button type="submit">
+                    Shorten URL
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    {% if short_url %}
+
+    <div class="result-card">
+
+        <div class="result-header">
+            Link Created Successfully
+        </div>
+
+        <div class="result-body">
+
+            <input
+                type="text"
+                id="shortLink"
+                value="{{ request.host_url }}{{ short_url }}"
+                readonly
+            >
+
+            <button onclick="copyLink()">
+                Copy
+            </button>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    <div class="links-card">
+
+        <div class="card-header">
+
+            <h2>Your Links</h2>
+
+            <span>
+                {{ links|length }} Links
+            </span>
+
+        </div>
+
+        {% if links %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Original URL</th>
+                        <th>Short Code</th>
+                        <th>Copy</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for link in links %}
+
+                    <tr>
+
+                        <td class="truncate">
+                            {{ link.original_url }}
+                        </td>
+
+                        <td>
+                            {{ link.short_code }}
+                        </td>
+
+                        <td>
+
+                            <button
+                                class="copy-btn"
+                                onclick="copySpecific('{{ request.host_url }}{{ link.short_code }}')"
+                            >
+                                Copy
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <h3>No links yet</h3>
+
+            <p>Create your first short URL above.</p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<script>
+
+function copyLink() {
+
+    let copyText = document.getElementById("shortLink");
+
+    navigator.clipboard.writeText(copyText.value);
+}
+
+function copySpecific(url) {
+
+    navigator.clipboard.writeText(url);
+}
+
+</script>
+
+{% endblock %}

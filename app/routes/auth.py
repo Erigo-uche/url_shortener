@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, session, flash, current_app
+from flask import Blueprint, request, redirect, url_for, session, flash, current_app, render_template
 from app import db, utils
 
 auth_bp = Blueprint("auth", __name__)
@@ -7,9 +7,14 @@ auth_bp = Blueprint("auth", __name__)
 def register():
     try:
         if request.method == "POST":
-            username = request.form["username"]
-            email = request.form["email"]
+            username = request.form["username"].strip()
+            email = request.form["email"].strip().lower()
             password = request.form["password"]
+
+            existing_user = db.check_existing_users(email)
+            if existing_user:
+                flash("Email already used")
+                return redirect(url_for("auth.register"))
 
             if not all([username, email, password]):
                 return "All fields required"
@@ -22,7 +27,7 @@ def register():
     
             return redirect(url_for("auth.login"))
         
-        return "register page"
+        return render_template("register.html")
     
     except Exception as e:
         current_app.logger.exception("Error loading register page: %s", e)
@@ -33,7 +38,7 @@ def register():
 def login():
     try:
         if request.method == "POST":
-            email = request.form["email"]
+            email = request.form["email"].strip().lower()
             password = request.form["password"]
 
             if not all([email, password]):
@@ -58,7 +63,7 @@ def login():
 
             return redirect("/dashboard")
         
-        return "login page" 
+        return render_template("login.html") 
     
     except Exception as e:
         current_app.logger.exception("Error loading login page: %s", e)

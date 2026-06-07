@@ -1,0 +1,157 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI",sans-serif;
+}
+
+body{
+    background:#ffffff;
+    min-height:100vh;
+}
+
+.auth-container{
+    display:flex;
+    min-height:100vh;
+}
+
+.brand-panel{
+    flex:1;
+    background:linear-gradient(
+        135deg,
+        #ff6b00,
+        #ff8c1a
+    );
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px;
+}
+
+.brand-content{
+    max-width:450px;
+    color:white;
+}
+
+.brand-content h1{
+    font-size:4rem;
+    margin-bottom:20px;
+}
+
+.brand-content p{
+    font-size:1.2rem;
+    line-height:1.8;
+}
+
+.form-panel{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:40px;
+    background:white;
+}
+
+.auth-card{
+    width:100%;
+    max-width:450px;
+}
+
+.auth-card h2{
+    font-size:2rem;
+    color:#222;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    color:#666;
+    margin-bottom:30px;
+}
+
+.input-group{
+    display:flex;
+    flex-direction:column;
+    margin-bottom:20px;
+}
+
+.input-group label{
+    margin-bottom:8px;
+    color:#444;
+    font-weight:600;
+}
+
+.input-group input{
+    padding:14px;
+    border:2px solid #eee;
+    border-radius:12px;
+    font-size:1rem;
+    transition:.3s;
+}
+
+.input-group input:focus{
+    outline:none;
+    border-color:#ff6b00;
+}
+
+.btn-primary{
+    width:100%;
+    border:none;
+    cursor:pointer;
+
+    background:#ff6b00;
+    color:white;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    font-size:1rem;
+    font-weight:600;
+
+    transition:.3s;
+}
+
+.btn-primary:hover{
+    background:#e65f00;
+    transform:translateY(-2px);
+}
+
+.auth-footer{
+    margin-top:25px;
+    text-align:center;
+    color:#555;
+}
+
+.auth-footer a{
+    text-decoration:none;
+    color:#ff6b00;
+    font-weight:700;
+}
+
+.flash-message{
+    background:#fff3eb;
+    color:#ff6b00;
+
+    border-left:5px solid #ff6b00;
+
+    padding:14px;
+    margin-bottom:20px;
+
+    border-radius:8px;
+}
+
+@media(max-width:900px){
+
+    .auth-container{
+        flex-direction:column;
+    }
+
+    .brand-panel{
+        min-height:250px;
+    }
+
+    .brand-content h1{
+        font-size:2.8rem;
+    }
+}

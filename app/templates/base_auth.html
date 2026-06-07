@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body>
+
+    <div class="auth-container">
+
+        <div class="brand-panel">
+            <div class="brand-content">
+                <h1>ShortLink</h1>
+                <p>
+                    Securely shorten, manage and track your links.
+                </p>
+            </div>
+        </div>
+
+        <div class="form-panel">
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash-message">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </div>
+
+</body>
+</html>
