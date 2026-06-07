@@ -16,6 +16,14 @@ def create_app():
     if not app.debug:
         app.config["SESSION_COOKIE_SECURE"] = True
 
+    #registering route file
+    from app.routes.auth import auth_bp
+    from app.routes.links import links_bp
+
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(links_bp)
+
+
     return app
 
 
