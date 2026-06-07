@@ -14,6 +14,7 @@ def home():
             return redirect(url_for("auth.login"))
         
         links = db.get_links(user_id)
+        total_clicks = sum(link[2] for link in links)
         
         short_url = None
         
@@ -39,7 +40,8 @@ def home():
         return render_template(
             "dashboard.html",
             links=links,
-            short_url=short_url
+            short_url=short_url,
+            total_clicks=total_clicks
         )
     except Exception as e:
         current_app.logger.exception("Error loading main page: %s", e)

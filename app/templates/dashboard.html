@@ -6,30 +6,33 @@ Dashboard
 
 {% block content %}
 
-<div class="dashboard-container">
+<div class="dashboard">
 
-    <div class="hero-section">
+    <!-- Hero Section -->
+    <section class="hero">
 
-        <h1>URL Shortener Dashboard</h1>
+        <div>
+            <h1>Your Link Dashboard</h1>
+            <p>Create, manage and track your shortened links.</p>
+        </div>
 
-        <p>
-            Create, manage and share shortened links.
-        </p>
+    </section>
 
-    </div>
+    <!-- Create Link Card -->
+    <section class="create-link-card">
 
-    <div class="create-card">
-
-        <h2>Create New Link</h2>
+        <div class="card-header">
+            <h2>Create Short Link</h2>
+        </div>
 
         <form method="POST">
 
-            <div class="url-input-group">
+            <div class="url-form">
 
                 <input
                     type="url"
                     name="original_url"
-                    placeholder="https://example.com"
+                    placeholder="Paste your long URL here..."
                     required
                 >
 
@@ -41,43 +44,62 @@ Dashboard
 
         </form>
 
-    </div>
+    </section>
 
+    <!-- Generated Link -->
     {% if short_url %}
 
-    <div class="result-card">
+    <section class="generated-card">
 
-        <div class="result-header">
-            Link Created Successfully
-        </div>
+        <h3>Link Created Successfully</h3>
 
-        <div class="result-body">
+        <div class="generated-url">
 
             <input
                 type="text"
-                id="shortLink"
-                value="{{ request.host_url }}{{ short_url }}"
+                id="generatedLink"
+                value="{{ short_url }}"
                 readonly
             >
 
-            <button onclick="copyLink()">
+            <button onclick="copyGenerated()">
                 Copy
             </button>
 
         </div>
 
-    </div>
+    </section>
 
     {% endif %}
 
-    <div class="links-card">
+    <!-- Statistics -->
+    <section class="stats-grid">
 
-        <div class="card-header">
+        <div class="stat-card">
+            <span class="stat-label">Links Created</span>
+            <span class="stat-value">
+                {{ links|length }}
+            </span>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Total Clicks</span>
+            <span class="stat-value">
+                {{ total_clicks }}
+            </span>
+        </div>
+
+    </section>
+
+    <!-- Links Table -->
+    <section class="links-card">
+
+        <div class="table-header">
 
             <h2>Your Links</h2>
 
-            <span>
-                {{ links|length }} Links
+            <span class="table-count">
+                {{ links|length }} links
             </span>
 
         </div>
@@ -89,11 +111,14 @@ Dashboard
             <table>
 
                 <thead>
+
                     <tr>
-                        <th>Original URL</th>
-                        <th>Short Code</th>
-                        <th>Copy</th>
+                        <th>Short URL</th>
+                        <th>Title</th>
+                        <th>Clicks</th>
+                        <th>Action</th>
                     </tr>
+
                 </thead>
 
                 <tbody>
@@ -102,19 +127,33 @@ Dashboard
 
                     <tr>
 
-                        <td class="truncate">
-                            {{ link.original_url }}
+                        <td class="short-link">
+                            {{ request.host_url }}{{ link[0] }}
                         </td>
 
                         <td>
-                            {{ link.short_code }}
+
+                            {% if link[1] %}
+                                {{ link[1] }}
+                            {% else %}
+                                Untitled Page
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <span class="click-badge">
+                                {{ link[2] }}
+                            </span>
+
                         </td>
 
                         <td>
 
                             <button
                                 class="copy-btn"
-                                onclick="copySpecific('{{ request.host_url }}{{ link.short_code }}')"
+                                onclick="copyLink('{{ request.host_url }}{{ link[0] }}')"
                             >
                                 Copy
                             </button>
@@ -135,30 +174,38 @@ Dashboard
 
         <div class="empty-state">
 
-            <h3>No links yet</h3>
+            <div class="empty-icon">
+                🔗
+            </div>
 
-            <p>Create your first short URL above.</p>
+            <h3>No Links Yet</h3>
+
+            <p>
+                Create your first shortened URL above.
+            </p>
 
         </div>
 
         {% endif %}
 
-    </div>
+    </section>
 
 </div>
 
 <script>
 
-function copyLink() {
+function copyGenerated() {
 
-    let copyText = document.getElementById("shortLink");
+    let link = document.getElementById("generatedLink");
 
-    navigator.clipboard.writeText(copyText.value);
+    navigator.clipboard.writeText(link.value);
+
 }
 
-function copySpecific(url) {
+function copyLink(url) {
 
     navigator.clipboard.writeText(url);
+
 }
 
 </script>
