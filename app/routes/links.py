@@ -30,12 +30,14 @@ def home():
         
             url_hash = hashlib.sha256(url.encode()).hexdigest()
         
-            encrypted_url = utils.encrypt_url(original_url)
+            encrypted_url = utils.encrypt_url(url)
 
             short_url = db.check_existing(user_id, url_hash)
 
             if not short_url:
                 short_url = db.gen_shortc(user_id, encrypted_url, url_hash)
+            
+            return redirect(url_for("links.home"))
 
         return render_template(
             "dashboard.html",

@@ -3,6 +3,11 @@ from app import db, utils
 
 auth_bp = Blueprint("auth", __name__)
 
+@auth_bp.route("/")
+def home():
+    return redirect(url_for("auth.login"))
+
+
 @auth_bp.route("/register", methods=["GET","POST"])
 def register():
     try:

@@ -55,14 +55,19 @@ Dashboard
 
         <div class="generated-url">
 
-            <input
-                type="text"
-                id="generatedLink"
-                value="{{ short_url }}"
-                readonly
+            <a
+                href="{{ short_url }}"
+                target="_blank"
+                class="generated-link"
             >
+                {{ short_url }}
+            </a>
+ 
 
-            <button onclick="copyGenerated()">
+            <button
+                id="generated-copy-btn" 
+                onclick="copyGenerated()"
+            >
                 Copy
             </button>
 
@@ -128,7 +133,13 @@ Dashboard
                     <tr>
 
                         <td class="short-link">
+                            <a 
+                            href="{{ request.host_url }}{{ link[0] }}"
+                            target="_blank"
+                            class="short-link"
+                            >
                             {{ request.host_url }}{{ link[0] }}
+                            </a>
                         </td>
 
                         <td>
@@ -153,7 +164,7 @@ Dashboard
 
                             <button
                                 class="copy-btn"
-                                onclick="copyLink('{{ request.host_url }}{{ link[0] }}')"
+                                onclick="copyLink(this, '{{ request.host_url }}{{ link[0] }}')"
                             >
                                 Copy
                             </button>
@@ -196,15 +207,30 @@ Dashboard
 
 function copyGenerated() {
 
-    let link = document.getElementById("generatedLink");
-
-    navigator.clipboard.writeText(link.value);
-
-}
-
-function copyLink(url) {
+    const url = "{{ short_url }}";
 
     navigator.clipboard.writeText(url);
+
+    const btn = document.getElementById("generated-copy-btn");
+
+    btn.innerText = "Copied ✓";
+
+    setTimeout(() => {
+        btn.innerText = "Copy";
+    }, 2000);
+}
+
+function copyLink(button, url) {
+
+    navigator.clipboard.writeText(url);
+
+    const original = button.innerText;
+
+    button.innerText = "Copied ✓";
+
+    setTimeout(() => {
+        button.innerText = original;
+    }, 2000);
 
 }
 

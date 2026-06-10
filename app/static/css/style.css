@@ -49,7 +49,7 @@ nav a{
     box-shadow:0 5px 20px rgba(0,0,0,.05);
 }
 
-.url-form{
+.url-form{ 
     display:flex;
     gap:12px;
     margin-top:20px;
@@ -90,6 +90,22 @@ nav a{
     align-items:center;
 
     margin-bottom:20px;
+}
+
+.table-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:20px;
+}
+
+.table-count{
+    color:#777;
+}
+
+.table-wrapper{
+    overflow-x:auto;
 }
 
 table{
@@ -201,20 +217,43 @@ tr{
     gap:12px;
 }
 
-.generated-url input{
+.generated-link{
+
     flex:1;
+
+    background:white;
+
     padding:14px;
+
     border:1px solid #ddd;
+
     border-radius:12px;
+
+    text-decoration:none;
+
+    color:#ff6b00;
+
+    font-weight:600;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
-.generated-url button{
-    border:none;
-    background:#ff6b00;
-    color:white;
-    padding:14px 24px;
-    border-radius:12px;
-    cursor:pointer;
+
+.short-link{
+
+    color:#ff6b00;
+    text-decoration:none;
+    font-weight:600;
+
+    transition:.2s;
+}
+
+.short-link:hover,
+.generated-link:hover{
+
+    text-decoration:underline;
 }
 
 .click-badge{
@@ -241,13 +280,24 @@ tr{
 
 @media(max-width:768px){
 
-    .url-form
+    header{
+        padding:20px;
+    }
+
+    .url-form,
     .generated-url{
         flex-direction:column;
     }
 
-    header{
-        padding: 20px;
+    .generated-link{
+        width:100%;
     }
 
+    nav{
+        gap:15px;
+    }
+
+    .hero h1{
+        font-size:2rem;
+    }
 }
