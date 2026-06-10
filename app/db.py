@@ -7,6 +7,7 @@ from app import utils
  
 
 Database_url = os.getenv("DATABASE_URL")
+base_url = os.getenv("BASE_URL")
 
 hashids = Hashids(
     salt=os.getenv("HashID_SALT"), 
@@ -70,7 +71,7 @@ def gen_shortc(user_id, encrypted_url, url_hash):
                           SET short_code = %s
                           WHERE id = %s""", (short_code, link_id) 
                           )
-                new_short_url = f"http://localhost:5000/{short_code}"
+                new_short_url = f"{base_url}/{short_code}"
                 return new_short_url
     except psycopg2.Error:
         current_app.logger.exception("Failed to form short_code")
@@ -86,7 +87,7 @@ def check_existing(user_id, url_hash):
                 result=c.fetchone()
                 if result:
                     short_code= result[0]
-                    new_short_url = f"http://localhost:5000/{short_code}"
+                    new_short_url = f"{base_url}/{short_code}"
                     return new_short_url 
                 return None
     except psycopg2.Error:
@@ -121,7 +122,7 @@ def get_redirect_url(short_code):
                 url = utils.decrypt_url(result[0])
                 if not url:
                     return Exception("Failed decryption")
-                c.execute("UPDATE links SET clicks = clicks + 1 WHERE short_code = %s", (short_code))
+                c.execute("UPDATE links SET clicks = clicks + 1 WHERE short_code = %s", (short_code,))
                 return url
     except psycopg2.Error:
         current_app.logger.exception("Failed to get url")

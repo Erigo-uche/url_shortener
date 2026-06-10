@@ -2,7 +2,7 @@ CREATE TABLE users(
     id SERIAL PRIMARY KEY,
     username VARCHAR(80) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL
+    password_hash TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -17,7 +17,7 @@ CREATE TABLE links(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT unique_user_url
-       UNIQUE (user_id, url_hash)
+       UNIQUE (user_id, url_hash),
 
     CONSTRAINT fk_user
        FOREIGN KEY(user_id)
