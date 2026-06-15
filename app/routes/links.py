@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, request, url_for, session, render_template, current_app, abort
+from flask import Blueprint, redirect, request, url_for, session, render_template, current_app, abort, flash
 from app import db, utils
 import hashlib
 
@@ -16,7 +16,7 @@ def home():
         links = db.get_links(user_id)
         total_clicks = sum(link[2] for link in links)
         
-        short_url = None
+        short_url = None 
         
         if request.method == "POST":
             original_url = request.form["original_url"]
@@ -36,6 +36,8 @@ def home():
 
             if not short_url:
                 short_url = db.gen_shortc(user_id, encrypted_url, url_hash)
+
+            flash(short_url, "generated_link")
             
             return redirect(url_for("links.home"))
 

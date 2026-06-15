@@ -5,7 +5,7 @@ Dashboard
 {% endblock %}
 
 {% block content %}
-
+ 
 <div class="dashboard">
 
     <!-- Hero Section -->
@@ -47,7 +47,9 @@ Dashboard
     </section>
 
     <!-- Generated Link -->
-    {% if short_url %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+       {% for category, message in messages %}
+           {% if category == "generated_link" %}
 
     <section class="generated-card">
 
@@ -56,17 +58,17 @@ Dashboard
         <div class="generated-url">
 
             <a
-                href="{{ short_url }}"
+                href="{{ message }}"
                 target="_blank"
                 class="generated-link"
             >
-                {{ short_url }}
+                {{ message }}
             </a>
  
 
             <button
                 id="generated-copy-btn" 
-                onclick="copyGenerated()"
+                onclick="copyGenerated('{{ message }}')"
             >
                 Copy
             </button>
@@ -75,7 +77,9 @@ Dashboard
 
     </section>
 
-    {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endwith %}
 
     <!-- Statistics -->
     <section class="stats-grid">
@@ -205,9 +209,7 @@ Dashboard
 
 <script>
 
-function copyGenerated() {
-
-    const url = "{{ short_url }}";
+function copyGenerated(url) {
 
     navigator.clipboard.writeText(url);
 

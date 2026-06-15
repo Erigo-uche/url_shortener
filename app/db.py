@@ -115,14 +115,14 @@ def get_redirect_url(short_code):
     try: 
         with db_connect() as conn:
             with conn.cursor() as c:
-                c.execute("SELECT encrypted_url FROM links WHERE short_code = %s", (short_code,))
+                c.execute("UPDATE links SET clicks = clicks + 1 WHERE short_code = %s RETURNING encrypted_url", (short_code,))
                 result = c.fetchone()
                 if not result:
                     return None
                 url = utils.decrypt_url(result[0])
                 if not url:
-                    return Exception("Failed decryption")
-                c.execute("UPDATE links SET clicks = clicks + 1 WHERE short_code = %s", (short_code,))
+                    return Exception("Failed decryption") 
+                                   
                 return url
     except psycopg2.Error:
         current_app.logger.exception("Failed to get url")
