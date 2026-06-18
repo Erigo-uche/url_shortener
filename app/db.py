@@ -52,7 +52,7 @@ def valid_p(email):
         current_app.logger.exception("Failed to fetch data")
         raise
 
-def gen_shortc(user_id, encrypted_url, url_hash):
+def gen_shortc(user_id, encrypted_url, url_hash, title):
     try:
         new_short_url = None
         with db_connect() as conn:
@@ -60,9 +60,10 @@ def gen_shortc(user_id, encrypted_url, url_hash):
                 c.execute("""INSERT INTO links(
                           user_id,
                           encrypted_url,
-                          url_hash) 
-                          VALUES(%s, %s, %s) RETURNING id 
-                          """,(user_id, encrypted_url, url_hash)
+                          url_hash,
+                          title) 
+                          VALUES(%s, %s, %s, %s) RETURNING id 
+                          """,(user_id, encrypted_url, url_hash, title)
                           )
                 link_id = c.fetchone()[0]
                 short_code = hashids.encode(link_id)
@@ -83,7 +84,7 @@ def check_existing(user_id, url_hash):
         with db_connect() as conn:
             with conn.cursor() as c:
                 c.execute("""SELECT short_code FROM links
-                WHERE user_id = %s AND url_hash = %s""", (user_id, url_hash))
+                WHERE user_id = %s AND url_hash = %s AND deleted_at is NULL""", (user_id, url_hash))
                 result=c.fetchone()
                 if result:
                     short_code= result[0]
@@ -105,6 +106,7 @@ def get_links(user_id):
                           clicks
                           FROM links 
                           WHERE user_id = %s
+                          AND deleted_at is NULL
                           ORDER BY created_at DESC """, (user_id,))
                 return c.fetchall()
     except psycopg2.Error:
@@ -115,7 +117,7 @@ def get_redirect_url(short_code):
     try: 
         with db_connect() as conn:
             with conn.cursor() as c:
-                c.execute("UPDATE links SET clicks = clicks + 1 WHERE short_code = %s RETURNING encrypted_url", (short_code,))
+                c.execute("UPDATE links SET clicks = clicks + 1 WHERE short_code = %s AND deleted_at is NULL RETURNING encrypted_url", (short_code,))
                 result = c.fetchone()
                 if not result:
                     return None
@@ -126,4 +128,39 @@ def get_redirect_url(short_code):
                 return url
     except psycopg2.Error:
         current_app.logger.exception("Failed to get url")
+        raise
+
+def delete_link(user_id, short_code):
+    try:
+        with db_connect() as conn:
+            with conn.cursor() as c: 
+                c.execute("""UPDATE links SET deleted_at = NOW()
+                          WHERE user_id=%s
+                          AND short_code=%s
+                          AND deleted_at IS NULL""", (user_id, short_code))
+    except psycopg2.Error:
+        current_app.logger.exception("Failed to delete link")
+        raise
+
+def deletd_list(user_id):
+    try:
+        with db_connect() as conn:
+            with conn.cursor() as c:
+                c.execute("""SELECT short_code, title, clicks, deleted_at 
+                          FROM links WHERE user_id=%s AND deleted_at IS NOT NULL
+                          ORDER BY deleted_at DESC""", (user_id,))
+                return c.fetchall()
+    except psycopg2.Error:
+        current_app.logger.exception("Failed to fetch deleted links")
+        raise
+
+def restore(user_id, short_code):
+    try:
+        with db_connect() as conn:
+            with conn.cursor() as c:
+                c.execute("""UPDATE links SET deleted_at = NULL
+                          WHERE user_id=%s
+                          AND short_code=%s""", (user_id, short_code))
+    except psycopg2.Error:
+        current_app.logger.exception("Failed to restore link")
         raise

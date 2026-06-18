@@ -261,6 +261,13 @@ tr{
     border-bottom:1px solid #eee;
 }
 
+.title-cell {
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .short-link{
     color:#ff6b00;
     text-decoration:none;
@@ -282,6 +289,132 @@ tr{
     border-radius:999px;
 
     font-weight:600;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+
+.delete-btn{
+
+    border:none;
+
+    background:#ff3b30;
+
+    color:white;
+
+    padding:15px 20px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-weight:600;
+}
+
+
+.delete-btn:hover{
+    opacity:.9;
+}
+
+.modal-overlay {
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.35);
+
+    backdrop-filter:blur(8px);
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:999;
+
+}
+
+.restore-modal {
+
+    width:500px;
+
+    max-height:70vh;
+
+    overflow:auto;
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:25px;
+
+}
+
+.restore-modal table {
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.restore-modal th,
+.restore-modal td {
+
+    padding:12px;
+
+    text-align:left;
+
+    border-bottom:1px solid #ddd;
+
+}
+
+.modal-header {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.deleted-item {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:15px;
+
+    border-bottom:1px solid #ddd;
+
+}
+
+.restore-btn {
+
+    margin-left:15px;
+
+}
+
+.nav-btn {
+
+    background:none;
+
+    border:none;
+
+    cursor:pointer;
+
+    font-size:inherit;
+
 }
 
 /* =========================

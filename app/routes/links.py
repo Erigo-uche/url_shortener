@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, request, url_for, session, render_template, current_app, abort, flash
+from flask import Blueprint, redirect, request, url_for, session, render_template, current_app, abort, flash, jsonify
 from app import db, utils
 import hashlib
 
@@ -32,10 +32,12 @@ def home():
         
             encrypted_url = utils.encrypt_url(url)
 
+            title = utils.get_title(url)
+
             short_url = db.check_existing(user_id, url_hash)
 
             if not short_url:
-                short_url = db.gen_shortc(user_id, encrypted_url, url_hash)
+                short_url = db.gen_shortc(user_id, encrypted_url, url_hash, title)
 
             flash(short_url, "generated_link")
             
@@ -61,6 +63,51 @@ def redirect_link(short_code):
         
     return redirect(url)
 
+@links_bp.route("/delete/<short_code>", methods=["POST"])
+def delete_link(short_code):
+    try:
+        user_id = session.get("user_id")
 
-    
+        if not user_id:
+            return redirect(url_for("auth.login"))
+        
+        db.delete_link(user_id, short_code)
+
+        flash("link successfully deleted")
+
+        return redirect(url_for("links.home"))
+    except Exception as e:
+        current_app.logger.exception("Failed deleting link: %s", e)
+        raise
+
+@links_bp.route("/deleted-links")
+def deleted_links():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        flash("Login required")
+        return redirect(url_for("auth.login"))
+
+    links = db.deletd_list(user_id)
+
+    return jsonify([
+    {
+        "short_code": link[0],
+        "title": link[1],
+        "clicks": link[2],
+        "deleted_at": link[3]
+    }
+    for link in links
+    ])
+
+@links_bp.route("/restore/<short_code>", methods=["POST"])
+def restore(short_code):
+    user_id = session.get("user_id")
+
+    db.restore(user_id, short_code)
+
+    return jsonify(
+        {"success": True}
+    )
+
     

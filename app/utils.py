@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 import requests
 from bs4 import BeautifulSoup
+from flask import current_app
 
 
 key = os.getenv("FERNET_KEY")
@@ -43,8 +44,10 @@ def get_title(url):
     
         return "No title"
     
-    except requests.RequestException:
-        return "Untitled"
+    except requests.RequestException as e:
+        current_app.logger.warning("Failed to get title: %s", e)
+        return "untitled"
+         
 
 
 

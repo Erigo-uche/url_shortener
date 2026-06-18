@@ -28,9 +28,9 @@
 
     <nav>
 
-        <a href="/dashboard">
-            Dashboard
-        </a>
+       <button id="restoreBtn" class="nav-btn">
+           Deleted links
+       </button>
 
         <a href="{{ url_for('auth.logout') }}">
             Logout
@@ -46,6 +46,192 @@
     {% endblock %}
 
 </main>
+
+<div id="restoreModal" class="modal-overlay">
+
+
+    <div class="restore-modal">
+
+
+        <div class="modal-header">
+
+            <h2>
+                Deleted Links
+            </h2>
+
+
+            <button id="closeModal">
+                ✕
+            </button>
+
+        </div>
+
+
+
+        <div id="deletedLinks">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Short URL</th>
+                        <th>Title</th>
+                        <th>Clicks</th>
+                        <th>Deleted At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+
+                <tbody id="deletedLinksBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+const modal = document.getElementById("restoreModal");
+
+const restoreBtn = document.getElementById("restoreBtn");
+
+const closeModal = document.getElementById("closeModal");
+
+
+restoreBtn.onclick = async ()=>{
+
+    modal.style.display = "flex";
+
+    loadDeletedLinks();
+
+};
+
+
+
+closeModal.onclick = ()=>{
+
+    modal.style.display="none";
+
+    window.location.reload();
+
+};
+
+
+
+async function loadDeletedLinks(){
+
+
+    const response =
+        await fetch("/deleted-links");
+
+
+    const links =
+        await response.json();
+
+
+    const tbody =
+        document.getElementById("deletedLinksBody");
+
+
+    tbody.innerHTML="";
+
+
+    if(links.length === 0){
+
+         tbody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    No deleted links
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    links.forEach(link=>{
+
+
+        tbody.innerHTML += `
+
+        <tr>
+
+
+            <td>
+                ${link.short_code}
+            </td>
+
+
+            <td>
+                ${link.title ?? "Untitled Page"}
+            </td>
+
+
+            <td>
+                ${link.clicks}
+            </td>
+
+
+            <td>
+                ${link.deleted_at}
+            </td>
+
+
+            <td>
+
+                <button
+                    onclick="restoreLink('${link.short_code}')"
+                >
+                    Restore
+                </button>
+
+            </td>
+
+
+        </tr>
+
+        `;
+
+
+    });
+
+
+}
+
+
+
+async function restoreLink(code){
+
+
+    const response =
+        await fetch(`/restore/${code}`, {
+
+            method:"POST"
+
+        });
+
+
+    const result =
+        await response.json();
+
+
+    if(result.success){
+
+        loadDeletedLinks();
+
+    }
+
+
+}
+
+
+</script>
 
 </body>
 </html>
