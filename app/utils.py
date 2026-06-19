@@ -6,6 +6,7 @@ from werkzeug.security import check_password_hash
 import requests
 from bs4 import BeautifulSoup
 from flask import current_app
+from urllib.parse import urlparse
 
 
 key = os.getenv("FERNET_KEY")
@@ -23,6 +24,16 @@ def hashp(original_p):
 def valp(oringinal_p, hashed):
     valid = check_password_hash(hashed, oringinal_p)
     return valid
+
+def valid_url(url):
+    parsed = urlparse(url)
+
+    if parsed.scheme not in ("http", "https"):
+        return False
+    if not parsed.netloc:
+        return False
+    
+    return True   
 
 def encrypt_url(url):
     encrypted = cipher.encrypt(url.encode())
@@ -47,12 +58,3 @@ def get_title(url):
     except requests.RequestException as e:
         current_app.logger.warning("Failed to get title: %s", e)
         return "untitled"
-         
-
-
-
-
-
-
-
-

@@ -25,8 +25,11 @@ def home():
             
             url = original_url.strip()
 
-            if url.endswith("/"):
-                url = url[:-1]
+            if not url.startswith("http://", "https://"):
+                url = "https://" + url
+            
+            if not utils.valid_url(url):
+                raise ValueError("Invalid URL")
         
             url_hash = hashlib.sha256(url.encode()).hexdigest()
         
