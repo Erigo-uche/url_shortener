@@ -139,7 +139,7 @@ nav a{
     border:1px solid #ffd2b3;
 }
 
-.generated-card h3{
+.generated-card.generated-link h3{
     color:#ff6b00;
     margin-bottom:15px;
 }
@@ -149,7 +149,7 @@ nav a{
     gap:12px;
 }
 
-.generated-link{
+.generated-card.generated-link{
 
     flex:1;
 
@@ -172,8 +172,50 @@ nav a{
     white-space:nowrap;
 }
 
-.generated-link:hover{
+.generated-card.generated-link:hover{
     text-decoration:underline;
+}
+
+/* existing active link */
+.generated-card.active_link {
+
+    background:#eefbf3;
+    border-color:#b7ebc6;
+
+}
+
+
+.generated-card.active_link h3 {
+
+    color:#15803d;
+
+}
+
+
+
+/* deleted/inactive link */
+.generated-card.inactive_link {
+
+    background:#fff7ed;
+    border-color:#fed7aa;
+
+}
+
+
+.generated-card.inactive_link h3 {
+
+    color:#ea580c;
+
+}
+
+
+/* when there is no URL, center the message */
+.generated-card.inactive_link p {
+
+    color:#555;
+
+    margin-top:10px;
+
 }
 
 /* =========================

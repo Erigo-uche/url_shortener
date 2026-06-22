@@ -25,7 +25,7 @@ def home():
             
             url = original_url.strip()
 
-            if not url.startswith("http://", "https://"):
+            if not url.startswith(("http://", "https://")):
                 url = "https://" + url
             
             if not utils.valid_url(url):
@@ -37,12 +37,19 @@ def home():
 
             title = utils.get_title(url)
 
-            short_url = db.check_existing(user_id, url_hash)
-
-            if not short_url:
+            existing = db.check_existing(user_id, url_hash)
+        
+            if existing:
+                if existing["active"]:
+                    short_url = existing["short_code"]
+                    flash(short_url, "active_link")
+                else:
+                    flash("Link is inactive", "inactive_link")
+            else:
                 short_url = db.gen_shortc(user_id, encrypted_url, url_hash, title)
-
-            flash(short_url, "generated_link")
+                flash(short_url, "generated_link")
+                                
+            
             
             return redirect(url_for("links.home"))
 

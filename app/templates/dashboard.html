@@ -48,37 +48,72 @@ Dashboard
 
     <!-- Generated Link -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-       {% for category, message in messages %}
-           {% if category == "generated_link" %}
+    {% for category, message in messages %}
+           
+    <section class="generated-card" {{ category }}>
 
-    <section class="generated-card">
+        {% if category == "generated_link" %}
 
         <h3>Link Created Successfully</h3>
 
         <div class="generated-url">
 
             <a
-                href="{{ message }}"
+                href="{{ request.host_url }}{{ message }}"
                 target="_blank"
                 class="generated-link"
             >
-                {{ message }}
+                {{ request.host_url }} {{ message }}
             </a>
  
 
             <button
                 id="generated-copy-btn" 
-                onclick="copyGenerated('{{ message }}')"
+                onclick="copyGenerated('{{ request.host_url }}{{ message }}')"
             >
                 Copy
             </button>
 
         </div>
 
+        {% elif category == "active_link" %}
+
+            <h3>Link Already Active</h3>
+
+
+        <div class="generated-url">
+
+            <a
+                href="{{ request.host_url }}{{ message }}"
+                target="_blank"
+                class="generated-link">
+                {{ request.host_url}}{{ message }}
+            </a>
+
+
+            <button
+                id="generated-copy-btn"
+                onclick="copyGenerated('{{ request.host_url }}{{ message }}')"
+            >
+                Copy
+            </button>
+
+        </div>
+
+        {% elif category == "inactive_link" %}
+
+        <h3>Link is inactive</h3>
+
+        <p>
+            This link was deleted before.
+            Restore it from deleted links to activate it.
+        </p>
+
+        {% endif %}
+
     </section>
 
-            {% endif %}
-        {% endfor %}
+    {% endfor %}
     {% endwith %}
 
     <!-- Statistics -->

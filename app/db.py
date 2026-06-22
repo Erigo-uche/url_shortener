@@ -72,7 +72,7 @@ def gen_shortc(user_id, encrypted_url, url_hash, title):
                           SET short_code = %s
                           WHERE id = %s""", (short_code, link_id) 
                           )
-                new_short_url = f"{base_url}/{short_code}"
+                new_short_url = f"{short_code}"
                 return new_short_url
     except psycopg2.Error:
         current_app.logger.exception("Failed to form short_code")
@@ -83,14 +83,25 @@ def check_existing(user_id, url_hash):
     try:
         with db_connect() as conn:
             with conn.cursor() as c:
-                c.execute("""SELECT short_code FROM links
-                WHERE user_id = %s AND url_hash = %s AND deleted_at is NULL""", (user_id, url_hash))
+                c.execute("""SELECT short_code, deleted_at FROM links
+                WHERE user_id = %s AND url_hash = %s""", (user_id, url_hash))
                 result=c.fetchone()
-                if result:
-                    short_code= result[0]
-                    new_short_url = f"{base_url}/{short_code}"
-                    return new_short_url 
-                return None
+                if not result:
+                    return None
+                
+                short_code, deleted_at = result
+
+                if deleted_at is None:
+                    return {
+                        "active": True,
+                        "short_code":short_code
+                    }
+                
+                return {
+                    "active": False,
+                    "short_code": None
+                }
+                  
     except psycopg2.Error:
         current_app.logger.exception("Failed to search url_hash")
         raise

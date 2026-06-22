@@ -82,11 +82,3 @@ def logout():
     flash("Logged out")
 
     return redirect(url_for("auth.login"))
-        
-            
-
-
-
-
-
-
