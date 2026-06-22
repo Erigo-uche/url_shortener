@@ -56,24 +56,27 @@ Dashboard
 
         <h3>Link Created Successfully</h3>
 
-        <div class="generated-url">
+        <div class="generated-content">
+            <div class="generated-link-box">
 
-            <a
+                <a
                 href="{{ request.host_url }}{{ message }}"
                 target="_blank"
                 class="generated-link"
             >
                 {{ request.host_url }} {{ message }}
-            </a>
- 
+                </a>
+            </div>
 
-            <button
+            <div class="generated-actions">
+
+                <button
                 id="generated-copy-btn" 
                 onclick="copyGenerated('{{ request.host_url }}{{ message }}')"
             >
                 Copy
-            </button>
-
+                </button>
+            </div>
         </div>
 
         {% elif category == "active_link" %}
@@ -81,22 +84,28 @@ Dashboard
             <h3>Link Already Active</h3>
 
 
-        <div class="generated-url">
+        <div class="generated-content">
+            <div class="generated-link-box">
 
-            <a
+                <a
                 href="{{ request.host_url }}{{ message }}"
                 target="_blank"
                 class="generated-link">
                 {{ request.host_url}}{{ message }}
-            </a>
+                </a>
 
+            </div>
 
-            <button
+            <div class="generated-actions">
+
+                <button
                 id="generated-copy-btn"
                 onclick="copyGenerated('{{ request.host_url }}{{ message }}')"
             >
                 Copy
-            </button>
+                </button>
+            
+            </div>
 
         </div>
 

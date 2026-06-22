@@ -104,118 +104,137 @@ nav a{
 }
 
 .url-form button,
-.generated-url button,
 .copy-btn{
-
     border:none;
-
     cursor:pointer;
-
     background:#ff6b00;
-
     color:white;
-
     padding:15px 25px;
-
     border-radius:12px;
-
     font-weight:600;
-
     transition:.2s;
 }
 
 .url-form button:hover,
-.generated-url button:hover,
 .copy-btn:hover{
     opacity:.9;
 }
 
 /* =========================
-   GENERATED URL
+   GENERATED CARD
 ========================= */
-
 .generated-card{
     background:#fff3eb;
     border:1px solid #ffd2b3;
+    padding:25px;
+    border-radius:18px;
+    margin-bottom:25px;
+    box-shadow:0 5px 20px rgba(0,0,0,.05);
 }
 
-.generated-card.generated-link h3{
-    color:#ff6b00;
+/* header area */
+.generated-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
     margin-bottom:15px;
 }
 
-.generated-url{
-    display:flex;
-    gap:12px;
+.generated-card h3{
+    margin-bottom:10px;
+    color:#ff6b00;
 }
 
-.generated-card.generated-link{
+/* =========================
+   GENERATED LINK CONTENT
+========================= */
+.generated-content{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+}
 
+.generated-link-box{
     flex:1;
-
     background:white;
-
-    padding:14px;
-
+    padding:16px 18px;
     border:1px solid #ddd;
+    border-radius:14px;
+    overflow:hidden;
+}
 
-    border-radius:12px;
-
-    text-decoration:none;
-
+/* the actual shortened url */
+.generated-link{
+    display:block;
     color:#ff6b00;
-
-    font-weight:600;
-
+    text-decoration:none;
+    font-weight:700;
+    font-size:1.15rem;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
 }
 
-.generated-card.generated-link:hover{
+.generated-link:hover{
     text-decoration:underline;
 }
 
-/* existing active link */
-.generated-card.active_link {
+/* =========================
+   ACTION BUTTON AREA
+========================= */
+.generated-actions{
+    display:flex;
+    gap:10px;
+}
 
+.generated-actions button{
+    border:none;
+    cursor:pointer;
+    background:#ff6b00;
+    color:white;
+    padding:14px 25px;
+    border-radius:12px;
+    font-weight:600;
+    transition:.2s;
+}
+
+.generated-actions button:hover{
+    opacity:.9;
+}
+
+/* =========================
+   ACTIVE LINK MESSAGE
+========================= */
+.generated-card.active_link{
     background:#eefbf3;
     border-color:#b7ebc6;
-
 }
 
-
-.generated-card.active_link h3 {
-
+.generated-card.active_link h3{
     color:#15803d;
-
 }
 
+.generated-card.active_link .generated-link{
+    color:#15803d;
+}
 
+/* =========================
+   INACTIVE LINK MESSAGE
+========================= */
 
-/* deleted/inactive link */
-.generated-card.inactive_link {
-
+.generated-card.inactive_link{
     background:#fff7ed;
     border-color:#fed7aa;
-
 }
 
-
-.generated-card.inactive_link h3 {
-
+.generated-card.inactive_link h3{
     color:#ea580c;
-
 }
 
-
-/* when there is no URL, center the message */
-.generated-card.inactive_link p {
-
+.generated-card.inactive_link p{
     color:#555;
-
     margin-top:10px;
-
 }
 
 /* =========================
@@ -499,5 +518,24 @@ tr{
 
     .hero h1{
         font-size:2rem;
+    }
+
+    .generated-content{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .generated-actions{
+        width:100%;
+    }
+
+    .generated-actions button{
+        width:100%;
+    }
+
+
+    .generated-link{
+
+        font-size:1rem;
     }
 }
