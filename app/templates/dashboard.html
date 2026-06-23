@@ -71,11 +71,37 @@ Dashboard
             <div class="generated-actions">
 
                 <button
-                id="generated-copy-btn" 
-                onclick="copyGenerated('{{ request.host_url }}{{ message }}')"
-            >
-                Copy
+                    id="generated-copy-btn" 
+                    onclick="copyGenerated('{{ request.host_url }}{{ message }}'), this"
+                >
+                    Copy
                 </button>
+
+                <div class="options-wrapper">
+                    <button
+                        class="options-btn"
+                        onclick="toggleOptions(this)"
+                    >
+                        ⋮
+                    </button>
+
+                    <div class="options-menu">
+                        <button 
+                            onclick="editlink('{ message }')">
+                            Edit
+                        </button>
+
+                        <form
+                            method="POST" 
+                            action="{{ url_for('links.delete_link', short_code=message) }}"
+                            onsubmit="return confirm('Delete this link?')"
+                        >
+                            <button type="submit">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -99,11 +125,37 @@ Dashboard
             <div class="generated-actions">
 
                 <button
-                id="generated-copy-btn"
-                onclick="copyGenerated('{{ request.host_url }}{{ message }}')"
-            >
-                Copy
+                    id="generated-copy-btn"
+                    onclick="copyGenerated('{{ request.host_url }}{{ message }}')"
+                >
+                    Copy
                 </button>
+
+                 <div class="options-wrapper">
+                    <button
+                        class="options-btn"
+                        onclick="toggleOptions(this)"
+                    >
+                        ⋮
+                    </button>
+
+                    <div class="options-menu">
+                        <button 
+                            onclick="editlink('{ message }')">
+                            Edit
+                        </button>
+
+                        <form
+                            method="POST" 
+                            action="{{ url_for('links.delete_link', short_code=message) }}"
+                            onsubmit="return confirm('Delete this link?')"
+                        >
+                            <button type="submit">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
             
             </div>
 
@@ -217,16 +269,31 @@ Dashboard
                                 Copy
                             </button>
 
-                            <form
-                                method="POST" 
-                                action="{{ url_for('links.delete_link', short_code=link[0])}}"
-                                onsubmit="return confirm('Delete this link?')">
-                            
-                                <button type="submit" class="delete-btn">
-                                    Delete
+                             <div class="options-wrapper">
+                                <button
+                                    class="options-btn"
+                                    onclick="toggleOptions(this)"
+                                >
+                                    ⋮
                                 </button>
-                            </form>
 
+                                <div class="options-menu">
+                                    <button 
+                                        onclick="editlink('{ message }')">
+                                        Edit
+                                    </button>
+
+                                    <form
+                                        method="POST" 
+                                        action="{{ url_for('links.delete_link', short_code=link[0]) }}"
+                                        onsubmit="return confirm('Delete this link?')"
+                                    >
+                                        <button type="submit">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </td>
 
                     </tr>
@@ -289,6 +356,48 @@ function copyLink(button, url) {
     }, 2000);
 
 }
+
+function toggleOptions(button){
+
+    const menu =
+        button.nextElementSibling;
+
+
+    document
+    .querySelectorAll(".options-menu")
+    .forEach(item=>{
+
+        if(item !== menu){
+
+            item.classList.remove("show");
+
+        }
+
+    });
+
+
+    menu.classList.toggle("show");
+
+}
+
+
+document.addEventListener(
+"click",
+function(event){
+
+    if(!event.target.closest(".options-wrapper")){
+
+        document
+        .querySelectorAll(".options-menu")
+        .forEach(menu=>{
+
+            menu.classList.remove("show");
+
+        });
+
+    }
+
+});
 
 </script>
 
