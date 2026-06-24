@@ -279,10 +279,10 @@ Dashboard
 
                                 <div class="options-menu">
                                     <button 
-                                        onclick="editlink('{ message }')">
+                                        onclick="editlink('{{ link[0] }}', '{{ link[1] }}')">
                                         Edit
                                     </button>
-
+ 
                                     <form
                                         method="POST" 
                                         action="{{ url_for('links.delete_link', short_code=link[0]) }}"
@@ -325,6 +325,66 @@ Dashboard
         {% endif %}
 
     </section>
+
+</div>
+
+<div id="editModal" class="modal-overlay">
+
+
+    <div class="edit-modal">
+
+
+        <div class="modal-header">
+
+            <h2>Edit Link</h2>
+
+            <button onclick="closeEditModal()">
+                ✕
+            </button>
+
+        </div>
+
+
+        <form id="editForm">
+
+
+            <label>
+                Short Code
+            </label>
+
+            <input
+                id="editShortCode"
+                name="short_code"
+                pattern="[A-Za-z0-9_-]+"
+            >
+
+
+
+            <label>
+                Title
+            </label>
+
+            <input
+                id="editTitle"
+                name="title"
+            >
+
+
+
+            <button
+                id="saveChanges"
+                type="submit"
+                style="display:none;"
+            >
+                Save Changes
+            </button>
+
+
+        </form>
+
+
+    </div>
+
 
 </div>
 
@@ -398,6 +458,83 @@ function(event){
     }
 
 });
+
+let originalShortCode = "";
+let originalTitle = "";
+
+
+function editlink(code,title){
+
+
+    originalShortCode = code;
+    originalTitle = title || "";
+
+
+    document
+    .getElementById("editShortCode")
+    .value = code;
+
+
+    document
+    .getElementById("editTitle")
+    .value = title || "";
+
+
+
+    document
+    .getElementById("saveChanges")
+    .style.display="none";
+
+
+
+    document
+    .getElementById("editModal")
+    .style.display="flex";
+
+}
+
+
+
+function closeEditModal(){
+
+    document
+    .getElementById("editModal")
+    .style.display="none";
+
+}
+
+const shortInput =
+document.getElementById("editShortCode");
+
+const titleInput =
+document.getElementById("editTitle");
+
+const saveBtn =
+document.getElementById("saveChanges");
+
+
+function checkChanges(){
+
+    let changed =
+        shortInput.value !== originalShortCode ||
+        titleInput.value !== originalTitle;
+
+
+
+    saveBtn.style.display =
+        changed ? "block" : "none";
+
+}
+
+shortInput.addEventListener(
+"input",
+checkChanges
+);
+
+titleInput.addEventListener(
+"input",
+checkChanges
+);
 
 </script>
 

@@ -120,4 +120,18 @@ def restore(short_code):
         {"success": True}
     )
 
-    
+@links_bp.route("/edit/<old_code>", methods=["POST"])
+def edit_link(old_code):
+    user_id = session.get("user_id")
+
+    new_code = request.form["short_code"]
+    title = request.form["title"]
+
+    result = db.update_link(user_id, old_code, new_code, title)
+
+    if result == "taken":
+        flash("This short_code already exists", "used code")
+    else:
+        flash("Link updated", "success")
+        
+    return redirect(url_for("links.home")) 

@@ -175,3 +175,22 @@ def restore(user_id, short_code):
     except psycopg2.Error:
         current_app.logger.exception("Failed to restore link")
         raise
+
+def update_link(user_id, old_code, new_code, title):
+    try:
+        with db_connect() as conn:
+            with conn.cursor() as c:
+                if old_code != new_code:
+                    c.execute("SELECT id FROM links WHERE short_code=%s", (new_code,))
+                    if c.fetchone():
+                        return "taken"
+                c.execute("""UPDATE links SET
+                          short-code=%s,
+                          title=%s WHERE
+                          user_id=%s AND
+                          short_code=%s""", (new_code, title, user_id, old_code))
+            conn.commit()
+        return "updated"
+    except psycopg2.Error:
+        current_app.logger.exception("Failed in update process!")
+        raise
