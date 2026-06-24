@@ -6,3 +6,4 @@ test.py
 __pycache__/
 *.py[cod]
 database/
+images/
