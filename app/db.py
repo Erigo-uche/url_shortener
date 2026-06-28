@@ -185,7 +185,7 @@ def update_link(user_id, old_code, new_code, title):
                     if c.fetchone():
                         return "taken"
                 c.execute("""UPDATE links SET
-                          short-code=%s,
+                          short_code=%s,
                           title=%s WHERE
                           user_id=%s AND
                           short_code=%s""", (new_code, title, user_id, old_code))

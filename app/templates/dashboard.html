@@ -71,8 +71,8 @@ Dashboard
             <div class="generated-actions">
 
                 <button
-                    id="generated-copy-btn" 
-                    onclick="copyGenerated('{{ request.host_url }}{{ message }}'), this"
+                    id="copy-btn" 
+                    onclick="copyLink(this,'{{ request.host_url }}{{ message }}')"
                 >
                     Copy
                 </button>
@@ -87,7 +87,7 @@ Dashboard
 
                     <div class="options-menu">
                         <button 
-                            onclick="editlink('{ message }')">
+                            onclick="editlink('{{ message }}')">
                             Edit
                         </button>
 
@@ -125,8 +125,8 @@ Dashboard
             <div class="generated-actions">
 
                 <button
-                    id="generated-copy-btn"
-                    onclick="copyGenerated('{{ request.host_url }}{{ message }}')"
+                    id="copy-btn"
+                    onclick="copyLink(this, '{{ request.host_url }}{{ message }}')"
                 >
                     Copy
                 </button>
@@ -141,7 +141,7 @@ Dashboard
 
                     <div class="options-menu">
                         <button 
-                            onclick="editlink('{ message }')">
+                            onclick="editlink('{{ message }}')">
                             Edit
                         </button>
 
@@ -338,14 +338,14 @@ Dashboard
 
             <h2>Edit Link</h2>
 
-            <button onclick="closeEditModal()">
+            <button type="button" onclick="closeEditModal()">
                 ✕
             </button>
 
         </div>
 
 
-        <form id="editForm">
+        <form id="editForm" method="POST">
 
 
             <label>
@@ -369,12 +369,12 @@ Dashboard
                 name="title"
             >
 
-
+            <p id="editError" class="edit-error" style="display:none;"></p>
 
             <button
                 id="saveChanges"
                 type="submit"
-                style="display:none;"
+                disabled
             >
                 Save Changes
             </button>
@@ -389,19 +389,6 @@ Dashboard
 </div>
 
 <script>
-
-function copyGenerated(url) {
-
-    navigator.clipboard.writeText(url);
-
-    const btn = document.getElementById("generated-copy-btn");
-
-    btn.innerText = "Copied ✓";
-
-    setTimeout(() => {
-        btn.innerText = "Copy";
-    }, 2000);
-}
 
 function copyLink(button, url) {
 
@@ -483,13 +470,22 @@ function editlink(code,title){
 
     document
     .getElementById("saveChanges")
-    .style.display="none";
+    .disabled = true;
 
+    const editError =
+        document.getElementById("editError");
+
+    editError.style.display = "none";
+    editError.innerText = "";
 
 
     document
     .getElementById("editModal")
     .style.display="flex";
+
+    document
+    .getElementById("editShortCode")
+    .focus();
 
 }
 
@@ -502,6 +498,24 @@ function closeEditModal(){
     .style.display="none";
 
 }
+
+document
+.getElementById("editModal")
+.addEventListener("click", function(event){
+
+    if (event.target === this) {
+        closeEditModal();
+    }
+
+});
+
+document.addEventListener("keydown", function(event){
+
+    if (event.key === "Escape") {
+        closeEditModal();
+    }
+
+});
 
 const shortInput =
 document.getElementById("editShortCode");
@@ -516,13 +530,12 @@ document.getElementById("saveChanges");
 function checkChanges(){
 
     let changed =
-        shortInput.value !== originalShortCode ||
-        titleInput.value !== originalTitle;
+        shortInput.value.trim() !== originalShortCode ||
+        titleInput.value.trim() !== originalTitle;
 
 
 
-    saveBtn.style.display =
-        changed ? "block" : "none";
+    saveBtn.disabled = !changed;
 
 }
 
@@ -535,6 +548,91 @@ titleInput.addEventListener(
 "input",
 checkChanges
 );
+
+
+
+const editForm =
+document.getElementById("editForm");
+
+
+editForm.addEventListener(
+"submit",
+async function(event){
+
+    event.preventDefault();
+
+    const newCode =
+        shortInput.value.trim();
+
+    const newTitle =
+        titleInput.value.trim();
+
+    const editError =
+        document.getElementById("editError");
+
+    editError.style.display = "none";
+    editError.innerText = "";
+
+    saveBtn.disabled = true;
+    const originalLabel = saveBtn.innerText;
+    saveBtn.innerText = "Saving...";
+
+    try {
+
+        const response =
+        await fetch(
+
+            `/edit/${originalShortCode}`,
+
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify({
+
+                    short_code:newCode,
+
+                    title:newTitle
+
+                })
+
+            }
+
+        );
+
+        const result =
+            await response.json();
+
+        if(result.success){
+
+            window.location.reload();
+
+        }
+
+        else{
+
+            editError.innerText = result.message || "Couldn't save changes. Try again.";
+            editError.style.display = "block";
+
+        }
+
+    } catch (err) {
+
+        editError.innerText = "Network error. Check your connection and try again.";
+        editError.style.display = "block";
+
+    } finally {
+
+        saveBtn.disabled = false;
+        saveBtn.innerText = originalLabel;
+
+    }
+
+});
+
 
 </script>
 

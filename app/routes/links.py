@@ -1,6 +1,10 @@
 from flask import Blueprint, redirect, request, url_for, session, render_template, current_app, abort, flash, jsonify
 from app import db, utils
 import hashlib
+import re
+import bleach
+
+CHECK_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 
 
 links_bp = Blueprint("links", __name__)
@@ -124,14 +128,26 @@ def restore(short_code):
 def edit_link(old_code):
     user_id = session.get("user_id")
 
-    new_code = request.form["short_code"]
-    title = request.form["title"]
+    if not user_id:
+        flash("Login required")
+        return redirect(url_for("auth.login"))
+
+    data = request.get_json() or {} 
+
+    new_code = (data.get("short_code") or "").strip()
+    title = (data.get("title") or "").strip()
+ 
+    if not new_code:
+        return jsonify({"success": False, "message": "Short code is required"}), 400
+ 
+    if not CHECK_RE.match(new_code):
+        return jsonify({"success": False, "message": "Short code can only contain letters, numbers, hyphens and underscores"}), 400
+ 
+    title = bleach.clean(title) 
 
     result = db.update_link(user_id, old_code, new_code, title)
 
     if result == "taken":
-        flash("This short_code already exists", "used code")
-    else:
-        flash("Link updated", "success")
-        
-    return redirect(url_for("links.home")) 
+        return jsonify({"success": False, "message": "This short code is already taken"}), 409
+
+    return jsonify({"success": True})

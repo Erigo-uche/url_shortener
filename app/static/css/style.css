@@ -439,10 +439,21 @@ tr{
     text-align:left;
 
     cursor:pointer;
+
+    color:#333;
+
+    font-weight:500;
+
+    border-radius:8px;
 }
 
 .options-menu button:hover {
     background:#f5f5f5;
+}
+
+.options-menu form button:hover {
+    background:#ffebe9;
+    color:#cf222e;
 }
 
 .modal-overlay {
@@ -461,6 +472,142 @@ tr{
     align-items:center;
 
     z-index:999;
+
+    padding:20px;
+}
+
+/* =========================
+   EDIT MODAL
+========================= */
+
+.edit-modal {
+
+    width:100%;
+    max-width:440px;
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:28px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.18);
+}
+
+.edit-modal .modal-header {
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:22px;
+}
+
+.edit-modal .modal-header h2 {
+
+    font-size:1.3rem;
+    color:#222;
+}
+
+.edit-modal .modal-header button {
+
+    border:none;
+    background:#f1f1f1;
+    color:#666;
+
+    width:32px;
+    height:32px;
+    border-radius:50%;
+
+    font-size:1rem;
+    line-height:1;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.edit-modal .modal-header button:hover {
+    background:#e5e5e5;
+    color:#222;
+}
+
+.edit-modal form {
+
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.edit-modal label {
+
+    font-size:.85rem;
+    font-weight:600;
+    color:#555;
+    margin-top:14px;
+}
+
+.edit-modal label:first-of-type {
+    margin-top:0;
+}
+
+.edit-modal input {
+
+    padding:13px 15px;
+
+    border:2px solid #eee;
+
+    border-radius:12px;
+
+    font-size:1rem;
+
+    transition:.15s;
+}
+
+.edit-modal input:focus {
+
+    outline:none;
+    border-color:#ff6b00;
+}
+
+.edit-modal input:invalid:not(:placeholder-shown) {
+    border-color:#ff3b30;
+}
+
+.edit-error {
+
+    color:#ff3b30;
+    font-size:.85rem;
+    margin-top:10px;
+}
+
+.edit-modal button[type="submit"] {
+
+    margin-top:22px;
+
+    border:none;
+    cursor:pointer;
+
+    background:#ff6b00;
+    color:white;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    font-weight:600;
+    font-size:1rem;
+
+    transition:.2s;
+}
+
+.edit-modal button[type="submit"]:hover:not(:disabled) {
+    opacity:.9;
+}
+
+.edit-modal button[type="submit"]:disabled {
+
+    background:#f1f1f1;
+    color:#aaa;
+    cursor:not-allowed;
 }
 
 .restore-modal {
