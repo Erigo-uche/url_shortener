@@ -7,7 +7,7 @@ from app import utils
  
 
 Database_url = os.getenv("DATABASE_URL")
-base_url = os.getenv("BASE_URL")
+
 
 hashids = Hashids(
     salt=os.getenv("HashID_SALT"), 
@@ -175,7 +175,24 @@ def restore(user_id, short_code):
     except psycopg2.Error:
         current_app.logger.exception("Failed to restore link")
         raise
-
+ 
+def clear_link(user_id, short_code):
+    "Hard delete: permanently removes a link row."
+    try:
+        with db_connect() as conn:
+            with conn.cursor() as c:
+                c.execute("""DELETE FROM links HWERE
+                          user_id=%s AND
+                          short_code=%s AND
+                          deleted_at IS NOT NULL
+                          RETURNING True""", (user_id, short_code))
+                deleted = c.fetchone()
+            conn.commit()
+        return deleted
+    except psycopg2.Error:
+        current_app.logger.exception("Error in delete process")
+        raise
+    
 def update_link(user_id, old_code, new_code, title):
     try:
         with db_connect() as conn:

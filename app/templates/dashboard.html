@@ -64,7 +64,7 @@ Dashboard
                 target="_blank"
                 class="generated-link"
             >
-                {{ request.host_url }} {{ message }}
+                {{ request.host_url }}{{ message }}
                 </a>
             </div>
 
@@ -163,12 +163,18 @@ Dashboard
 
         {% elif category == "inactive_link" %}
 
-        <h3>Link is inactive</h3>
+        <h3>{{ message }}</h3>
 
         <p>
             This link was deleted before.
             Restore it from deleted links to activate it.
         </p>
+
+        {% elif category == "warning" %}
+
+        <h3>Warning</h3>
+        
+        <p>{{ message }}</p>
 
         {% endif %}
 

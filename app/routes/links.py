@@ -25,7 +25,7 @@ def home():
         if request.method == "POST":
             original_url = request.form["original_url"]
             if not original_url:
-                raise ValueError("URL is required")
+                flash("URL is required", "warning")
             
             url = original_url.strip()
 
@@ -33,7 +33,7 @@ def home():
                 url = "https://" + url
             
             if not utils.valid_url(url):
-                raise ValueError("Invalid URL")
+                flash("Invalid URL. Please enter a valid website address.", "warning")
         
             url_hash = hashlib.sha256(url.encode()).hexdigest()
         
@@ -87,12 +87,12 @@ def delete_link(short_code):
         
         db.delete_link(user_id, short_code)
 
-        flash("link successfully deleted")
-
         return redirect(url_for("links.home"))
     except Exception as e:
         current_app.logger.exception("Failed deleting link: %s", e)
-        raise
+        flash("Something went wrong. Please try again.","warning")
+        return redirect(url_for("links.home"))
+
 
 @links_bp.route("/deleted-links")
 def deleted_links():
@@ -123,6 +123,23 @@ def restore(short_code):
     return jsonify(
         {"success": True}
     )
+
+@links_bp.route("/clear/<short_code>", methods=["POST"])
+def clear(short_code):
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({"success": False, "message": "Login required"}), 401
+
+    try:
+        deleted = db.clear_link(user_id, short_code)
+    except Exception:
+        return jsonify({"success": False, "message": "Couldn't delete this link"}), 500
+
+    if not deleted:
+        return jsonify({"success": False, "message": "Link not found"}), 404
+
+    return jsonify({"success": True})
 
 @links_bp.route("/edit/<old_code>", methods=["POST"])
 def edit_link(old_code):

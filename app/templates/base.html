@@ -55,12 +55,15 @@
 
         <div class="modal-header">
 
-            <h2>
-                Deleted Links
-            </h2>
+            <div>
+                <h2>
+                    Deleted Links
+                </h2>
+                <p class="modal-subtitle" id="deletedCount"></p>
+            </div>
 
 
-            <button id="closeModal">
+            <button id="closeModal" aria-label="Close">
                 ✕
             </button>
 
@@ -77,7 +80,7 @@
                         <th>Short URL</th>
                         <th>Title</th>
                         <th>Clicks</th>
-                        <th>Deleted At</th>
+                        <th>Deleted</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -101,6 +104,8 @@ const restoreBtn = document.getElementById("restoreBtn");
 
 const closeModal = document.getElementById("closeModal");
 
+const deletedCountEl = document.getElementById("deletedCount");
+
 
 restoreBtn.onclick = async ()=>{
 
@@ -120,32 +125,95 @@ closeModal.onclick = ()=>{
 
 };
 
+modal.addEventListener("click", function(event){
+
+    if (event.target === modal) {
+
+        modal.style.display = "none";
+
+        window.location.reload();
+
+    }
+
+});
+
+document.addEventListener("keydown", function(event){
+
+    if (event.key === "Escape" && modal.style.display === "flex") {
+
+        modal.style.display = "none";
+
+        window.location.reload();
+
+    }
+
+});
+
+
+function formatDeletedAt(value){
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) return value;
+
+    return date.toLocaleDateString(undefined, {
+
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+
+    });
+
+}
+
+
+function escapeHtml(str){
+
+    const div = document.createElement("div");
+
+    div.innerText = str ?? "";
+
+    return div.innerHTML;
+
+}
 
 
 async function loadDeletedLinks(){
 
 
-    const response =
-        await fetch("/deleted-links");
-
-
-    const links =
-        await response.json();
-
-
     const tbody =
         document.getElementById("deletedLinksBody");
 
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="5" class="modal-loading">
+                Loading deleted links...
+            </td>
+        </tr>
+    `;
 
-    tbody.innerHTML="";
+    deletedCountEl.innerText = "";
 
 
-    if(links.length === 0){
+    let links;
 
-         tbody.innerHTML = `
+    try {
+
+        const response =
+            await fetch("/deleted-links");
+
+        if (!response.ok) {
+            throw new Error("Request failed");
+        }
+
+        links = await response.json();
+
+    } catch (err) {
+
+        tbody.innerHTML = `
             <tr>
-                <td colspan="5">
-                    No deleted links
+                <td colspan="5" class="modal-error-row">
+                    Couldn't load deleted links. Try again.
                 </td>
             </tr>
         `;
@@ -155,40 +223,74 @@ async function loadDeletedLinks(){
     }
 
 
+    tbody.innerHTML="";
+
+
+    if(links.length === 0){
+
+        deletedCountEl.innerText = "Nothing here";
+
+         tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="modal-empty-row">
+                    <div class="modal-empty-icon">🗑️</div>
+                    No deleted links
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+    deletedCountEl.innerText = `${links.length} link${links.length === 1 ? "" : "s"}`;
+
+
     links.forEach(link=>{
 
+        const safeCode = escapeHtml(link.short_code);
+        const safeTitle = escapeHtml(link.title ?? "Untitled Page");
 
         tbody.innerHTML += `
 
-        <tr>
+        <tr id="deleted-row-${safeCode}">
 
 
-            <td>
-                ${link.short_code}
+            <td class="deleted-short-code">
+                ${safeCode}
+            </td>
+
+
+            <td class="title-cell" title="${safeTitle}">
+                ${safeTitle}
             </td>
 
 
             <td>
-                ${link.title ?? "Untitled Page"}
+                <span class="click-badge">${link.clicks}</span>
             </td>
 
 
-            <td>
-                ${link.clicks}
+            <td class="deleted-date">
+                ${formatDeletedAt(link.deleted_at)}
             </td>
 
 
-            <td>
-                ${link.deleted_at}
-            </td>
-
-
-            <td>
+            <td class="deleted-actions">
 
                 <button
-                    onclick="restoreLink('${link.short_code}')"
+                    class="restore-btn"
+                    onclick="restoreLink('${safeCode}')"
                 >
                     Restore
+                </button>
+
+                <button
+                    class="clear-btn"
+                    onclick="clearLink('${safeCode}')"
+                    title="Delete permanently"
+                >
+                    Delete forever
                 </button>
 
             </td>
@@ -208,25 +310,64 @@ async function loadDeletedLinks(){
 
 async function restoreLink(code){
 
+    try {
 
-    const response =
-        await fetch(`/restore/${code}`, {
+        const response =
+            await fetch(`/restore/${code}`, {
 
-            method:"POST"
+                method:"POST"
 
-        });
+            });
 
+        const result =
+            await response.json();
 
-    const result =
-        await response.json();
+        if(result.success){
 
+            loadDeletedLinks();
 
-    if(result.success){
+        }
 
-        loadDeletedLinks();
+    } catch (err) {
+
+        alert("Couldn't restore this link. Try again.");
 
     }
 
+}
+
+
+async function clearLink(code){
+
+    if (!confirm("Permanently delete this link? This can't be undone.")) {
+
+        return;
+
+    }
+
+    try {
+
+        const response =
+            await fetch(`/clear/${code}`, {
+
+                method:"POST"
+
+            });
+
+        const result =
+            await response.json();
+
+        if(result.success){
+
+            loadDeletedLinks();
+
+        }
+
+    } catch (err) {
+
+        alert("Couldn't delete this link. Try again.");
+
+    }
 
 }
 
