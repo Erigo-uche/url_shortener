@@ -15,6 +15,7 @@ CREATE TABLE links(
     title TEXT DEFAULT '',
     clicks INT DEFAULT 0, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP DEFAULT NULL,
 
     CONSTRAINT unique_user_url
        UNIQUE (user_id, url_hash),
