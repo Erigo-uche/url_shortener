@@ -181,7 +181,8 @@ def clear_link(user_id, short_code):
     try:
         with db_connect() as conn:
             with conn.cursor() as c:
-                c.execute("""DELETE FROM links HWERE
+                c.execute("""DELETE FROM links 
+                          WHERE
                           user_id=%s AND
                           short_code=%s AND
                           deleted_at IS NOT NULL
